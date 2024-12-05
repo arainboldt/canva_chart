@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const morgan = require('morgan');
 const yargs = require('yargs');
+const csv = require('csv-stringify');
 
 // Parse command line arguments
 const argv = yargs
@@ -39,6 +40,12 @@ if (argv.logging) {
 // Serve static files
 app.use(express.static('public'));
 
+// Ensure data directory exists
+const dataDir = path.join(__dirname, 'public', 'data');
+if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+}
+
 // API endpoint for saving selections
 app.post('/api/save-selection', express.json(), (req, res) => {
     const selection = req.body;
@@ -52,6 +59,49 @@ app.post('/api/save-selection', express.json(), (req, res) => {
     }
     
     res.json({ success: true, message: 'Selection saved' });
+});
+
+// API endpoint for saving generated data
+app.post('/api/save-data', express.json(), (req, res) => {
+    const data = req.body;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `candlestick_data_${timestamp}.csv`;
+    const filepath = path.join(dataDir, filename);
+
+    // Convert data to CSV
+    csv.stringify(data, {
+        header: true,
+        columns: ['date', 'open', 'high', 'low', 'close']
+    }, (err, output) => {
+        if (err) {
+            console.error('Error generating CSV:', err);
+            return res.status(500).json({ error: 'Failed to generate CSV' });
+        }
+
+        // Write CSV file
+        fs.writeFile(filepath, output, (err) => {
+            if (err) {
+                console.error('Error writing file:', err);
+                return res.status(500).json({ error: 'Failed to save file' });
+            }
+            res.json({ 
+                success: true, 
+                filename,
+                path: `/data/${filename}`
+            });
+        });
+    });
+});
+
+// API endpoint to list available data files
+app.get('/api/list-data', (req, res) => {
+    fs.readdir(dataDir, (err, files) => {
+        if (err) {
+            console.error('Error reading data directory:', err);
+            return res.status(500).json({ error: 'Failed to list data files' });
+        }
+        res.json(files.filter(f => f.endsWith('.csv')));
+    });
 });
 
 app.listen(port, () => {

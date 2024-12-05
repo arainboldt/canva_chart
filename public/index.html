@@ -6,7 +6,7 @@
     <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="https://cdn.canvasjs.com/canvasjs.stock.min.js"></script>
     <script type="text/javascript" src="/js/selectionManager.js"></script>
-    <script type="text/javascript" src="/js/candlestickChart.js"></script>
+    <script type="text/javascript" src="/js/CandlestickChart.js"></script>
 </head>
 <body>
     <div class="main-container">
@@ -24,5 +24,15 @@
             <div class="selection-content"></div>
         </div>
     </div>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const chart = new CandlestickChart('chartContainer');
+            
+            // Load the default data
+            $.getJSON("https://canvasjs.com/data/docs/ethusd2018.json", function(data) {
+                chart.loadData(data);
+            });
+        });
+    </script>
 </body>
 </html> 
