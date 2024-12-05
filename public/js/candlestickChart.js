@@ -14,6 +14,9 @@ window.onload = function() {
             },
             zoomEnabled: false,
             panEnabled: true,
+            toolTip: {
+                enabled: false
+            },
             data: [{
                 type: "candlestick",
                 yValueFormatString: "$#,###.00",
