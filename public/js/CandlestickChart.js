@@ -15,7 +15,10 @@ class CandlestickChart {
                 maximum: null
             },
             onSave: options.onSave || this.defaultSaveHandler,
-            height: options.height || "60vh"
+            height: options.height || "60vh",
+            risingColor: options.risingColor || "#008000",        // Green by default
+            fallingColor: options.fallingColor || "#FF0000",      // Red by default
+            highlightColor: options.highlightColor || "#00FF00"   // Bright green by default
         };
 
         this.initialize();
@@ -47,6 +50,10 @@ class CandlestickChart {
                     type: "candlestick",
                     yValueFormatString: this.options.pricePrefix + "#,###.00",
                     dataPoints: this.dataPoints,
+                    risingColor: this.options.risingColor,          // Add rising color
+                    fallingColor: this.options.fallingColor,        // Add falling color
+                    highlightEnabled: true,                         // Enable highlighting
+                    highlightColor: this.options.highlightColor,    // Add highlight color
                     click: (e) => {
                         if (this.selectionManager.isCtrlPressed) {
                             this.chart.charts[0].set("panEnabled", false);
@@ -196,6 +203,15 @@ class CandlestickChart {
     }
 
     defaultSaveHandler(selectedData) {
-        console.log('Selected data:', selectedData);
+        console.log('Selected dates:', selectedData);
+    }
+
+    getSelectedData() {
+        const selectedPoints = this.selectionManager.getSelectedPoints(this.chart.charts[0].data[0]);
+        // Transform the data to only return formatted dates
+        return selectedPoints.map(point => {
+            const date = point.x;
+            return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+        });
     }
 } 
