@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Candlestick Chart with Selection</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="https://cdn.canvasjs.com/canvasjs.stock.min.js"></script>
+    <script type="text/javascript" src="/js/selectionManager.js"></script>
+    <script type="text/javascript" src="/js/candlestickChart.js"></script>
+</head>
+<body>
+    <div class="main-container">
+        <div class="chart-container">
+            <div id="chartContainer"></div>
+        </div>
+        
+        <div class="button-container">
+            <button id="clearSelection">Clear Selection</button>
+            <button id="saveSelection">Save Selection</button>
+        </div>
+        
+        <div class="selection-display">
+            <h3>Selected Candlesticks</h3>
+            <div class="selection-content"></div>
+        </div>
+    </div>
+</body>
+</html> 
