@@ -98,28 +98,29 @@ class SelectionManager {
         const axisX = chart.parent.axisX[0];
         const axisY = chart.parent.axisY[0];
 
-        const startDate = axisX.convertPixelToValue(left);
-        const endDate = axisX.convertPixelToValue(right);
+        const startDate = new Date(axisX.convertPixelToValue(left));
+        const endDate = new Date(axisX.convertPixelToValue(right));
         const highPrice = axisY.convertPixelToValue(top);
         const lowPrice = axisY.convertPixelToValue(bottom);
 
         chart.dataPoints.forEach(point => {
-            const [open, high, low, close] = point.y;
-            if (point.x >= new Date(startDate) && point.x <= new Date(endDate)) {
-                if (high >= lowPrice && low <= highPrice) {
+            if (point.x >= startDate && point.x <= endDate) {
+                const [open, high, low, close] = point.y;
+                
+                // TODO: Re-enable y-axis constraints when needed
+                /* if (Math.min(high, low, open, close) <= highPrice && 
+                       Math.max(high, low, open, close) >= lowPrice) { */
                     this.selectedPoints.add(point.x.getTime());
-                }
+                /* } */
             }
         });
 
-        // Clean up drag rectangle
         if (this.dragRect && this.dragRect.parentNode) {
             this.dragRect.parentNode.removeChild(this.dragRect);
         }
         this.dragRect = null;
         this.isDragging = false;
 
-        // Force immediate visual update
         this.refreshDisplay(chart.parent);
     }
 
@@ -129,7 +130,6 @@ class SelectionManager {
             this.selectedPoints.add(pointId);
             point.borderColor = "#FF9900";
             point.color = "#FFB84D";
-            // Force immediate render for visual feedback
             chart.parent.render();
         }
     }
@@ -143,24 +143,20 @@ class SelectionManager {
             this.selectedPoints.add(pointId);
         }
         
-        // Force immediate visual update
         this.refreshDisplay(chart.parent);
     }
 
     clearSelection(chart) {
         this.selectedPoints.clear();
-        // Force immediate visual update
         this.refreshDisplay(chart.parent);
     }
 
     refreshDisplay(chart) {
-        // First reset all highlights
         chart.data[0].dataPoints.forEach(point => {
             point.borderColor = null;
             point.color = null;
         });
 
-        // Then apply highlights to selected points
         chart.data[0].dataPoints.forEach(point => {
             const pointId = point.x.getTime();
             if (this.selectedPoints.has(pointId)) {
@@ -169,7 +165,6 @@ class SelectionManager {
             }
         });
 
-        // Update selection display
         const container = document.querySelector('.selection-content');
         container.innerHTML = '';
 
@@ -191,7 +186,6 @@ class SelectionManager {
             }
         });
 
-        // Force chart render
         chart.render();
     }
 
